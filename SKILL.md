@@ -51,6 +51,11 @@ If the Agent description file is missing, or memory targets are not defined:
   - long-term index location
   - daily documents location
   - knowledge-store location (if used)
+- If paths are still missing after confirmation, ask whether to create defaults:
+  - long-term memory file: `MEMORY.md`
+  - daily notes directory: `memory/daily/`
+  - knowledge directory: `memory/knowledge/`
+- If user agrees to create targets, also append/update a `## Memory` block in the Agent description file using the user-confirmed paths.
 - Resume only after user confirmation.
 
 ## Scope policy (privacy first)
@@ -93,13 +98,14 @@ If checks are weak, keep content in daily documents and do not promote.
 3. In `shared` scope, enforce access gate: block long-term memory reads; ask user before daily/knowledge access.
 4. Resolve Agent description file by platform defaults.
 5. Discover long-term index target, daily-notes path, and knowledge target from that file.
-6. If targets are missing, ask user for path confirmation and pause.
-7. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
-8. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
-9. Choose target memory file/path by policy.
-10. Make minimal file edit.
-11. Send standard receipt message.
-12. Apply citation policy for normal replies.
+6. If targets are missing, ask user for path confirmation; if still missing, ask whether to create default targets and pause.
+7. If user confirms creation, create targets and update Agent description file `## Memory` section with chosen paths.
+8. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
+9. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
+10. Choose target memory file/path by policy.
+11. Make minimal file edit.
+12. Send standard receipt message.
+13. Apply citation policy for normal replies.
 
 ## Decision table
 
@@ -117,7 +123,8 @@ If checks are weak, keep content in daily documents and do not promote.
 | `shared context + daily/knowledge access requested`         | Ask user for permission before access                                                    |
 | `unknown context_scope`                                     | Ask user to confirm scope and explain `private/shared` permissions; pause memory actions |
 | `missing Agent description file`                            | Ask user to provide/confirm Agent description file path; pause memory actions            |
-| `missing memory targets in Agent description file`          | Ask user to provide/confirm target paths; pause memory actions                           |
+| `missing memory targets in Agent description file`          | Ask user to provide/confirm target paths; if unresolved, ask to create default targets   |
+| `user approved target creation`                             | Create targets and insert/update `## Memory` section in Agent description file           |
 | `conflicting preference update`                             | Ask before overwrite                                                                     |
 
 ## Delete/update policy
@@ -139,6 +146,8 @@ If checks are weak, keep content in daily documents and do not promote.
 - Delete success: `Deleted: <summary> (target: <target-type>, id: <id-or-key>).`
 - Path request (missing Agent description file): `Memory action paused: Agent description file not found. Please provide or confirm the Agent description file path.`
 - Path request (missing memory targets): `Memory action paused: long-term index / daily documents / knowledge targets are not fully defined. Please provide or confirm paths.`
+- Create request (missing targets): `Memory targets are still missing. Create defaults? long-term file: MEMORY.md, daily directory: memory/daily/, knowledge directory: memory/knowledge/`
+- Create success: `Created memory targets and updated Agent description file Memory section with chosen paths.`
 - No-op (missing knowledge target): `No memory action taken: knowledge target is not defined in Agent description file.`
 - Scope request (unknown scope): `Memory action paused: context scope is unclear. Please confirm scope. private = memory read/write allowed by policy; shared = long-term memory read blocked, and daily/knowledge access requires confirmation.`
 - Permission request (shared daily/knowledge): `Shared scope detected. Please confirm permission to access daily documents/knowledge for this task.`
@@ -158,3 +167,17 @@ If checks are weak, keep content in daily documents and do not promote.
 ## AGENTS.md integration
 
 When user asks to enforce globally, add policy from `references/agents-memory-policy.md` into the platform Agent description file (`AGENTS.md` or `CLAUDE.md`) with minimal edits.
+
+## Memory section template (for creation flow)
+
+When user approves creating targets, write/update this in Agent description file with user-selected paths:
+
+```markdown
+## Memory
+
+You wake up fresh each session. These files are your continuity:
+
+- **Daily notes:** `<DAILY_DIR>/YYYY-MM-DD.md` (create `memory/` if needed) — raw logs of what happened
+- **Long-term:** `<LONG_TERM_FILE>` — your curated memories, like a human's long-term memory
+- **Knowledge:** `<KNOWLEDGE_DIR>/<KNOWLEDGE>-YYYY-MM-DD`, your knowledge
+```
