@@ -7,7 +7,8 @@
 - if user shows clear global-memory intent, ask whether to store globally before writing.
 - Discover long-term index target, daily-notes path, and knowledge target (if defined) from the Agent description file before any memory action.
 - Do not assume fixed paths such as `MEMORY.md` or `memory/YYYY-MM-DD.md` unless explicitly defined.
-- If the Agent description file is missing, or memory targets are not defined: pause memory actions and ask user to provide/confirm paths.
+- If the Agent description file is missing: ask whether to create it first; if user declines, stop memory operation.
+- If memory targets are not defined: pause and ask user to provide/confirm paths.
 - If targets remain unresolved, ask user whether to create default targets:
 - long-term memory file: `MEMORY.md`
 - daily notes directory: `memory/daily/`

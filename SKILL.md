@@ -56,7 +56,14 @@ After locating the Agent description file, discover memory targets from its cont
 
 Do not assume fixed paths like `MEMORY.md` or `memory/YYYY-MM-DD.md` unless the Agent description file explicitly defines them.
 
-If the Agent description file is missing, or memory targets are not defined:
+If the Agent description file is missing:
+
+- Pause memory read/write/delete/update actions.
+- Ask the user whether to create the Agent description file first.
+- If user declines creation, stop memory operation.
+- If user agrees, create Agent description file, then continue with memory-target discovery.
+
+If memory targets are not defined:
 
 - Pause memory read/write/delete/update actions.
 - Ask the user to confirm paths for:
@@ -111,15 +118,16 @@ If checks are weak, keep content in daily documents and do not promote.
 4. Determine `context_scope`: `private / shared` (if unknown, ask user and pause).
 5. In `shared` scope, enforce access gate: block long-term memory reads; ask user before daily/knowledge access.
 6. Resolve Agent description file by platform defaults.
-7. Discover long-term index target, daily-notes path, and knowledge target from that file.
-8. If targets are missing, ask user for path confirmation; if still missing, ask whether to create default targets and pause.
-9. If user confirms creation, create targets and update Agent description file `## Memory` section with chosen paths.
-10. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
-11. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
-12. Choose target memory file/path by policy.
-13. Make minimal file edit.
-14. Send standard receipt message.
-15. Apply citation policy for normal replies.
+7. If Agent description file is missing, ask whether to create it; if user declines, stop.
+8. Discover long-term index target, daily-notes path, and knowledge target from that file.
+9. If targets are missing, ask user for path confirmation; if still missing, ask whether to create default targets and pause.
+10. If user confirms creation, create targets and update Agent description file `## Memory` section with chosen paths.
+11. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
+12. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
+13. Choose target memory file/path by policy.
+14. Make minimal file edit.
+15. Send standard receipt message.
+16. Apply citation policy for normal replies.
 
 ## Decision table
 
@@ -138,7 +146,7 @@ If checks are weak, keep content in daily documents and do not promote.
 | `project Agent description file exists`                     | Use project memory scope by default                                                      |
 | `clear global-memory intent`                                | Ask user to confirm global storage before writing                                        |
 | `unknown context_scope`                                     | Ask user to confirm scope and explain `private/shared` permissions; pause memory actions |
-| `missing Agent description file`                            | Ask user to provide/confirm Agent description file path; pause memory actions            |
+| `missing Agent description file`                            | Ask whether to create Agent description file; if declined, stop                          |
 | `missing memory targets in Agent description file`          | Ask user to provide/confirm target paths; if unresolved, ask to create default targets   |
 | `user approved target creation`                             | Create targets and insert/update `## Memory` section in Agent description file           |
 | `conflicting preference update`                             | Ask before overwrite                                                                     |
@@ -160,7 +168,8 @@ If checks are weak, keep content in daily documents and do not promote.
 
 - Write success: `Written: <target-type> updated (id: <id-or-key>).`
 - Delete success: `Deleted: <summary> (target: <target-type>, id: <id-or-key>).`
-- Path request (missing Agent description file): `Memory action paused: Agent description file not found. Please provide or confirm the Agent description file path.`
+- Description file request: `Agent description file not found. Create it now? (yes/no)`
+- Description file declined: `Memory operation stopped: Agent description file was not created.`
 - Path request (missing memory targets): `Memory action paused: long-term index / daily documents / knowledge targets are not fully defined. Please provide or confirm paths.`
 - Create request (missing targets): `Memory targets are still missing. Create defaults? long-term file: MEMORY.md, daily directory: memory/daily/, knowledge directory: memory/knowledge/`
 - Create success: `Created memory targets and updated Agent description file Memory section with chosen paths.`
