@@ -28,6 +28,18 @@ Agent-side write guardrails for safe, auditable memory operations across platfor
 - Long-term memory (shallow layer): lightweight summaries of stable knowledge, preferences, and decisions.
 - Knowledge store: structured and reusable knowledge.
 
+## Response language
+
+- Choose reply language based on user context (recent conversation language, explicit user preference, and platform profile).
+- If context is mixed or unclear, ask the user which language to use.
+
+## Project vs global memory scope
+
+- Support both project-level and global-level memory targets.
+- Use descriptor-based resolution: if a project Agent description file exists, default to project memory scope.
+- If user shows clear intent to save globally (for example "remember this globally", "applies to all projects"), ask for confirmation before writing to global memory scope.
+- If user does not explicitly confirm global storage, keep writes in project scope.
+
 ## Discovery from Agent description file
 
 Use this platform mapping to locate the Agent description file:
@@ -94,18 +106,20 @@ If checks are weak, keep content in daily documents and do not promote.
 ## Operational checklist
 
 1. Classify request: `save / update / delete / read-only`.
-2. Determine `context_scope`: `private / shared` (if unknown, ask user and pause).
-3. In `shared` scope, enforce access gate: block long-term memory reads; ask user before daily/knowledge access.
-4. Resolve Agent description file by platform defaults.
-5. Discover long-term index target, daily-notes path, and knowledge target from that file.
-6. If targets are missing, ask user for path confirmation; if still missing, ask whether to create default targets and pause.
-7. If user confirms creation, create targets and update Agent description file `## Memory` section with chosen paths.
-8. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
-9. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
-10. Choose target memory file/path by policy.
-11. Make minimal file edit.
-12. Send standard receipt message.
-13. Apply citation policy for normal replies.
+2. Determine reply language from user context; if unclear, ask user.
+3. Determine project/global memory scope: if project Agent description exists, default to project; for global intent, ask user confirmation.
+4. Determine `context_scope`: `private / shared` (if unknown, ask user and pause).
+5. In `shared` scope, enforce access gate: block long-term memory reads; ask user before daily/knowledge access.
+6. Resolve Agent description file by platform defaults.
+7. Discover long-term index target, daily-notes path, and knowledge target from that file.
+8. If targets are missing, ask user for path confirmation; if still missing, ask whether to create default targets and pause.
+9. If user confirms creation, create targets and update Agent description file `## Memory` section with chosen paths.
+10. Classify memory intent: `short-term only / promote to long-term-index / promote to knowledge`.
+11. For long-term/knowledge updates, run `rg`/`grep` on target docs to detect related or contradictory entries.
+12. Choose target memory file/path by policy.
+13. Make minimal file edit.
+14. Send standard receipt message.
+15. Apply citation policy for normal replies.
 
 ## Decision table
 
@@ -121,6 +135,8 @@ If checks are weak, keep content in daily documents and do not promote.
 | `update long-term index/knowledge + contradiction detected` | Alert user with contradiction summary and ask for confirmation before update             |
 | `shared context + long-term memory read`                    | Block operation                                                                          |
 | `shared context + daily/knowledge access requested`         | Ask user for permission before access                                                    |
+| `project Agent description file exists`                     | Use project memory scope by default                                                      |
+| `clear global-memory intent`                                | Ask user to confirm global storage before writing                                        |
 | `unknown context_scope`                                     | Ask user to confirm scope and explain `private/shared` permissions; pause memory actions |
 | `missing Agent description file`                            | Ask user to provide/confirm Agent description file path; pause memory actions            |
 | `missing memory targets in Agent description file`          | Ask user to provide/confirm target paths; if unresolved, ask to create default targets   |

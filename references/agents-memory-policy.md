@@ -1,6 +1,10 @@
 ## Memory Governance Policy (Global)
 
+- Choose reply language from user context (recent conversation language, explicit preference, platform profile). If unclear, ask user.
 - Default Agent description file: OpenClaw uses `AGENTS.md`, Claude Code uses `CLAUDE.md`, Codex defaults to `AGENTS.md`.
+- Support project and global memory scopes:
+- if a project Agent description file exists, default to project scope.
+- if user shows clear global-memory intent, ask whether to store globally before writing.
 - Discover long-term index target, daily-notes path, and knowledge target (if defined) from the Agent description file before any memory action.
 - Do not assume fixed paths such as `MEMORY.md` or `memory/YYYY-MM-DD.md` unless explicitly defined.
 - If the Agent description file is missing, or memory targets are not defined: pause memory actions and ask user to provide/confirm paths.
