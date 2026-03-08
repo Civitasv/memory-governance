@@ -103,40 +103,40 @@ If checks are weak, keep content in daily documents and do not promote.
 
 ## Decision table
 
-| Condition | Action |
-| --- | --- |
-| `short-term session fact` | Write discovered daily-notes target |
-| `promote to long-term-index + private + explicit consent` | Write discovered long-term index target |
-| `promote to long-term-index + no explicit consent` | Do not write long-term index; ask for consent |
-| `promote to long-term-index + criteria weak` | Keep in daily documents only |
-| `promote to knowledge + target defined` | Write discovered knowledge target |
-| `promote to knowledge + criteria weak` | Keep in daily documents only |
-| `promote to knowledge + target missing` | No-op: do not perform knowledge write |
-| `update long-term index/knowledge + contradiction detected` | Alert user with contradiction summary and ask for confirmation before update |
-| `shared context + long-term memory read` | Block operation |
-| `shared context + daily/knowledge access requested` | Ask user for permission before access |
-| `unknown context_scope` | Ask user to confirm scope and explain `private/shared` permissions; pause memory actions |
-| `missing Agent description file` | Ask user to provide/confirm Agent description file path; pause memory actions |
-| `missing memory targets in Agent description file` | Ask user to provide/confirm target paths; pause memory actions |
-| `conflicting preference update` | Ask before overwrite |
+| Condition                                                   | Action                                                                                   |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `short-term session fact`                                   | Write discovered daily-notes target                                                      |
+| `promote to long-term-index + private + explicit consent`   | Write discovered long-term index target                                                  |
+| `promote to long-term-index + no explicit consent`          | Do not write long-term index; ask for consent                                            |
+| `promote to long-term-index + criteria weak`                | Keep in daily documents only                                                             |
+| `promote to knowledge + target defined`                     | Write discovered knowledge target                                                        |
+| `promote to knowledge + criteria weak`                      | Keep in daily documents only                                                             |
+| `promote to knowledge + target missing`                     | No-op: do not perform knowledge write                                                    |
+| `update long-term index/knowledge + contradiction detected` | Alert user with contradiction summary and ask for confirmation before update             |
+| `shared context + long-term memory read`                    | Block operation                                                                          |
+| `shared context + daily/knowledge access requested`         | Ask user for permission before access                                                    |
+| `unknown context_scope`                                     | Ask user to confirm scope and explain `private/shared` permissions; pause memory actions |
+| `missing Agent description file`                            | Ask user to provide/confirm Agent description file path; pause memory actions            |
+| `missing memory targets in Agent description file`          | Ask user to provide/confirm target paths; pause memory actions                           |
+| `conflicting preference update`                             | Ask before overwrite                                                                     |
 
 ## Delete/update policy
 
 - On "forget/delete a memory", first locate the exact target (prefer stable `id` or exact line/section key), then delete.
-- Confirm completion with file path and short deleted summary.
+- Confirm completion with short deleted summary and target type; include full file path only if user explicitly requests it.
 - On "update preference", replace only the smallest relevant block.
 - On long-term index/knowledge update, first search target docs with `rg`/`grep`; if new content contradicts existing entries, show both sides and ask user whether to replace, merge, or keep existing.
 
 ## Citation and disclosure policy
 
-- If a reply relies on stored memory in `private` scope, append: `Memory reference: <file>#<section-or-brief-key>`.
+- If a reply relies on stored memory in `private` scope, append: `Memory reference: <memory-id-or-source-key>`.
 - If scope is `shared`, do not expose local file paths in the reply.
 - If no memory is used, do not add citation line.
 
 ## Receipt templates
 
-- Write success: `Written: <path>#<section>`
-- Delete success: `Deleted: <summary> (<path>)`
+- Write success: `Written: <target-type> updated (id: <id-or-key>).`
+- Delete success: `Deleted: <summary> (target: <target-type>, id: <id-or-key>).`
 - Path request (missing Agent description file): `Memory action paused: Agent description file not found. Please provide or confirm the Agent description file path.`
 - Path request (missing memory targets): `Memory action paused: long-term index / daily documents / knowledge targets are not fully defined. Please provide or confirm paths.`
 - No-op (missing knowledge target): `No memory action taken: knowledge target is not defined in Agent description file.`
@@ -153,7 +153,7 @@ If checks are weak, keep content in daily documents and do not promote.
 - Reading long-term memory in shared contexts.
 - Accessing daily documents or knowledge in shared contexts without user confirmation.
 - Overwriting full sections when only one preference changed.
-- Returning "done" without file path or deletion summary.
+- Returning "done" without a clear target/id and change summary.
 
 ## AGENTS.md integration
 

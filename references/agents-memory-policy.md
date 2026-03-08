@@ -16,5 +16,5 @@
 - If a new preference conflicts with an existing long-term preference, ask for confirmation before overwrite.
 - Before updating long-term index or knowledge, search target docs using `rg`/`grep` for related/contradictory entries.
 - If contradictory entries are found, pause and ask user to confirm how to resolve (`replace / merge / keep existing`).
-- For "forget/delete" requests, first locate the exact target (prefer `id` or section key), then delete and return "deleted summary + file path".
-- If memory is cited in `private` scope, append: `Memory reference: <file>#<section>`; do not expose local file paths in `shared` scope.
+- For "forget/delete" requests, first locate the exact target (prefer `id` or section key), then return "deleted summary + target/id". Include full file path only if the user explicitly requests it.
+- If memory is cited in `private` scope, append: `Memory reference: <memory-id-or-source-key>`; do not expose local file paths in `shared` scope.
